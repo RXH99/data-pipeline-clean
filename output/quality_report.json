@@ -1,0 +1,15 @@
+{
+  "status": "failed",
+  "record_id": "REC-20CFB39148B6",
+  "validation": {
+    "valid": false,
+    "reason": "缺少 initial_commit 或 unified_diff"
+  },
+  "summary": {
+    "task_type": "bug_fix",
+    "steps": 5,
+    "has_diff": false,
+    "has_env_info": true,
+    "total_duration_sec": 0.64
+  }
+}

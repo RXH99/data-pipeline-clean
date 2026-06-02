@@ -110,8 +110,15 @@ class InteractionRecorder:
         }
 
     def _generate_unified_diff(self) -> str:
-        """生成工作区未提交变更的 Unified Diff"""
-        return self._run("git diff")
+        """
+        生成包含新文件的完整 Unified Diff
+        先用 git add 暂存所有变更（包括新文件），再用 diff --cached 生成 diff
+        """
+        self._run("git add -A")
+        diff = self._run("git diff --cached")
+        # 生成完后 unstage，保持工作区干净
+        self._run("git reset HEAD . >nul 2>nul")
+        return diff
 
 # ──────────────────────────────────────────────
     # 核心方法：初始化、记录步骤、结束输出
