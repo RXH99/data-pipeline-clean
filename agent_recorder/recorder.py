@@ -253,6 +253,9 @@ class ConsistencyValidator:
 
         project = Path(project_dir)
         patch_file = project / f".tmp_{record['record_id']}.patch"
+         # DEBUG: 看看 patch 内容
+        print(f"  [debug] patch 内容预览:\n{diff[:500]}")
+        print(f"  [debug] patch 总长度: {len(diff)} 字符")
         # 用 UTF-8 无 BOM 写 patch，换行统一为 LF
         clean_diff = diff.replace('\r\n', '\n')
         with open(patch_file, 'w', encoding='utf-8', newline='\n') as f:
