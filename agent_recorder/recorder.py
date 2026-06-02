@@ -118,10 +118,10 @@ class InteractionRecorder:
     def _generate_unified_diff(self) -> str:
         """
         生成包含新文件的完整 Unified Diff
-        用 git add -A 暂存 → diff --cached 生成 → unstage
+        只追踪 tasks/ 和 pipeline/ 下的变更，排除 output/ 输出文件
         """
-        self._run("git add -A")
-        diff = self._run("git diff --cached --no-color")  # 加 --no-color 防 ANSI 字符
+        self._run("git add tasks/ pipeline/ agent_recorder/ scripts/ examples/")
+        diff = self._run("git diff --cached --no-color")
         self._run("git reset HEAD . >nul 2>nul")
         return diff
 
