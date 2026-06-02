@@ -253,8 +253,10 @@ class ConsistencyValidator:
 
         project = Path(project_dir)
         patch_file = project / f".tmp_{record['record_id']}.patch"
-       # 用 utf-8-sig (带 BOM) 写 patch，Windows 上 git apply 才不会乱码
-        Path(patch_file).write_text(diff, encoding="utf-8-sig")
+       # patch 必须是纯 ASCII，用 w 模式写（不要 BOM），同时把 CRLF 转 LF
+        clean_diff = diff.replace('\r\n', '\n')
+        with open(patch_file, 'w', encoding='ascii', newline='\n') as f:
+            f.write(clean_diff)
 
         # 暂存当前工作区
         stash_result = subprocess.run(
