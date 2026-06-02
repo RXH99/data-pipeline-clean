@@ -1,0 +1,15 @@
+FROM python:3.9-slim
+
+WORKDIR /app
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+COPY pipeline/ pipeline/
+COPY agent_recorder/ agent_recorder/
+COPY scripts/ scripts/
+COPY examples/ examples/
+COPY tasks/ tasks/
+
+RUN mkdir -p output
+
+CMD ["python", "scripts/run_agent_demo.py"]

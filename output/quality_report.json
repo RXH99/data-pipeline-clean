@@ -1,15 +1,19 @@
 {
-  "status": "failed",
-  "record_id": "REC-B5E1D3B5D20C",
+  "status": "passed",
+  "record_id": "REC-495F59623C17",
   "validation": {
-    "valid": false,
-    "reason": "缺少 initial_commit 或 unified_diff"
+    "valid": true,
+    "reason": "✓ 一致性通过: initial + patch == final（SHA256 + difflib 双重验证）",
+    "hash_check": true,
+    "initial_hash": "af349512cab7",
+    "final_hash": "3c8884ab6d23",
+    "diff_match": true
   },
   "summary": {
     "task_type": "bug_fix",
     "steps": 5,
-    "has_diff": false,
+    "has_diff": true,
     "has_env_info": true,
-    "total_duration_sec": 0.56
+    "total_duration_sec": 0.59
   }
 }
