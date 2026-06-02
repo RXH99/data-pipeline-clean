@@ -1,0 +1,10 @@
+__pycache__/
+*.pyc
+*.pyo
+venv/
+.venv/
+output/*.jsonl
+output/*.csv
+!output/.gitkeep
+sample.csv
+.DS_Store
