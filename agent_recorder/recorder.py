@@ -116,8 +116,8 @@ class InteractionRecorder:
         }
 
     def _generate_unified_diff(self) -> str:
-        """生成工作区未提交变更的 Unified Diff"""
-        return self._run("git diff --no-color")
+        """只生成 tasks/ 目录的 Unified Diff"""
+        return self._run("git diff --no-color -- tasks/")
 
 # ──────────────────────────────────────────────
     # 核心方法：初始化、记录步骤、结束输出

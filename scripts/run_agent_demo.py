@@ -73,11 +73,6 @@ def step2_agent_recording():
     test_csv = tasks_dir / "test.csv"
     test_csv.write_text("a,b,c\n1,2,3\n\n4,5,6\n", encoding="utf-8")
 
-    # ─── ★新增：先把任务文件提交到 Git，确保 patch 可追溯 ──
-    import subprocess as sp
-    sp.run("git add tasks/", shell=True, cwd=ROOT, capture_output=True)
-    sp.run('git commit -m "wip: init task state for recording"', shell=True, cwd=ROOT, capture_output=True)
-
     # ─── 初始化记录器 ─────────────────────────────────
     print(f"\n  [任务] {task.task_id}: {task.title}")
     recorder = InteractionRecorder(str(ROOT), task_id=task.task_id)

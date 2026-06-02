@@ -1,15 +1,15 @@
 {
   "status": "failed",
-  "record_id": "REC-5BEE6B430424",
+  "record_id": "REC-D3D6BB7BFE90",
   "validation": {
     "valid": false,
-    "reason": "Patch 应用失败: error: corrupt patch at line 14\n"
+    "reason": "Patch 应用失败: error: corrupt patch at line 94\n"
   },
   "summary": {
     "task_type": "bug_fix",
     "steps": 5,
     "has_diff": true,
     "has_env_info": true,
-    "total_duration_sec": 0.69
+    "total_duration_sec": 0.56
   }
 }
