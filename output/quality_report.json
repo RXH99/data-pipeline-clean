@@ -1,9 +1,9 @@
 {
   "status": "failed",
-  "record_id": "REC-F1B4141486E7",
+  "record_id": "REC-5BEE6B430424",
   "validation": {
     "valid": false,
-    "reason": "Patch 应用失败: error: corrupt patch at line 16\n"
+    "reason": "Patch 应用失败: error: corrupt patch at line 14\n"
   },
   "summary": {
     "task_type": "bug_fix",

@@ -116,14 +116,8 @@ class InteractionRecorder:
         }
 
     def _generate_unified_diff(self) -> str:
-        """
-        生成包含新文件的完整 Unified Diff
-        只追踪 tasks/ 和 pipeline/ 下的变更，排除 output/ 输出文件
-        """
-        self._run("git add tasks/ pipeline/ agent_recorder/ scripts/ examples/")
-        diff = self._run("git diff --cached --no-color")
-        self._run("git reset HEAD . >nul 2>nul")
-        return diff
+        """生成工作区未提交变更的 Unified Diff"""
+        return self._run("git diff --no-color")
 
 # ──────────────────────────────────────────────
     # 核心方法：初始化、记录步骤、结束输出
@@ -253,9 +247,6 @@ class ConsistencyValidator:
 
         project = Path(project_dir)
         patch_file = project / f".tmp_{record['record_id']}.patch"
-         # DEBUG: 看看 patch 内容
-        print(f"  [debug] patch 内容预览:\n{diff[:500]}")
-        print(f"  [debug] patch 总长度: {len(diff)} 字符")
         # 用 UTF-8 无 BOM 写 patch，换行统一为 LF
         clean_diff = diff.replace('\r\n', '\n')
         with open(patch_file, 'w', encoding='utf-8', newline='\n') as f:
