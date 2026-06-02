@@ -253,9 +253,9 @@ class ConsistencyValidator:
 
         project = Path(project_dir)
         patch_file = project / f".tmp_{record['record_id']}.patch"
-       # patch 必须是纯 ASCII，用 w 模式写（不要 BOM），同时把 CRLF 转 LF
+        # 用 UTF-8 无 BOM 写 patch，换行统一为 LF
         clean_diff = diff.replace('\r\n', '\n')
-        with open(patch_file, 'w', encoding='ascii', newline='\n') as f:
+        with open(patch_file, 'w', encoding='utf-8', newline='\n') as f:
             f.write(clean_diff)
 
         # 暂存当前工作区
