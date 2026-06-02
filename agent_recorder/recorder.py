@@ -80,13 +80,19 @@ class InteractionRecorder:
         }
 
     def _run(self, cmd: str) -> str:
-        """执行一条 shell 命令，返回 stdout（去掉前后空白）"""
+        """执行一条 shell 命令，返回 stdout——兼容中文 Windows 编码"""
         try:
             result = subprocess.run(
                 cmd, shell=True, cwd=self.project_dir,
-                capture_output=True, text=True, timeout=30
+                capture_output=True, timeout=30   # 去掉 text=True，拿到 raw bytes
             )
-            return result.stdout.strip()
+            # 优先 utf-8 解码，失败时用系统编码（GBK）兜底
+            for enc in ["utf-8", "gbk", "gb18030"]:
+                try:
+                    return result.stdout.decode(enc).strip()
+                except UnicodeDecodeError:
+                    continue
+            return result.stdout.decode("utf-8", errors="replace").strip()
         except subprocess.TimeoutExpired:
             return "[TIMEOUT]"
         except Exception as e:
@@ -112,11 +118,10 @@ class InteractionRecorder:
     def _generate_unified_diff(self) -> str:
         """
         生成包含新文件的完整 Unified Diff
-        先用 git add 暂存所有变更（包括新文件），再用 diff --cached 生成 diff
+        用 git add -A 暂存 → diff --cached 生成 → unstage
         """
         self._run("git add -A")
-        diff = self._run("git diff --cached")
-        # 生成完后 unstage，保持工作区干净
+        diff = self._run("git diff --cached --no-color")  # 加 --no-color 防 ANSI 字符
         self._run("git reset HEAD . >nul 2>nul")
         return diff
 
@@ -248,7 +253,8 @@ class ConsistencyValidator:
 
         project = Path(project_dir)
         patch_file = project / f".tmp_{record['record_id']}.patch"
-        Path(patch_file).write_text(diff, encoding="utf-8")
+       # 用 utf-8-sig (带 BOM) 写 patch，Windows 上 git apply 才不会乱码
+        Path(patch_file).write_text(diff, encoding="utf-8-sig")
 
         # 暂存当前工作区
         stash_result = subprocess.run(
