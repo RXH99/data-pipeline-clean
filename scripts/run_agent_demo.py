@@ -62,60 +62,50 @@ def step2_agent_recording():
     print("=" * 55)
 
     tasks_dir = ROOT / "tasks"
-
-    # ─── 准备任务文件 ─────────────────────────────────
     task = TASK_FIX_CSV_READER
 
-    # ─── 写入初始代码 ─────────────────────────────────
-    task = TASK_FIX_CSV_READER
+    # ─── 第1步：清理旧文件 + 写入初始代码 ──────────────
+    # 删除旧文件，确保 git 能追踪到"新增文件"这个变更
+    for f in tasks_dir.glob("*"):
+        if f.is_file():
+            f.unlink()
+
     csv_file = tasks_dir / "csv_reader.py"
     csv_file.write_text(task.initial_code, encoding="utf-8")
     test_csv = tasks_dir / "test.csv"
     test_csv.write_text("a,b,c\n1,2,3\n\n4,5,6\n", encoding="utf-8")
 
-    # ─── 初始化记录器 ─────────────────────────────────
     print(f"\n  [任务] {task.task_id}: {task.title}")
+
+    # ─── 第2步：提交初始状态到 Git ─────────────────────
+    import subprocess as sp
+    sp.run("git add tasks/", shell=True, cwd=ROOT, capture_output=True)
+    sp.run('git commit -m "tmp: init task state" --allow-empty', shell=True, cwd=ROOT, capture_output=True)
+
+    # ─── 第3步：初始化记录器（此时 git 里有初始代码）────
     recorder = InteractionRecorder(str(ROOT), task_id=task.task_id)
     recorder.snapshot_initial_state()
 
-    # ─── 初始化记录器 ─────────────────────────────────
-    print(f"\n  [任务] {task.task_id}: {task.title}")
-    recorder = InteractionRecorder(str(ROOT), task_id=task.task_id)
-    recorder.snapshot_initial_state()
+    # ─── 第4步：模拟 AI 交互 ────────────────────────────
+    recorder.record("think", {"thought": "检查 csv_reader.py，发现空行时 IndexError"})
+    recorder.record("read_file", {"file": "tasks/csv_reader.py", "content_preview": task.initial_code[:120]})
 
-    # ─── 模拟 AI Agent 的完整交互流程 ─────────────────
-    # 1. 理解需求
-    recorder.record("think", {
-        "thought": "检查 csv_reader.py，发现空行时 parts 列表长度不足，导致 IndexError。需要加空行跳过逻辑。"
-    })
-
-    # 2. 读文件
-    recorder.record("read_file", {
-        "file": "tasks/csv_reader.py",
-        "content_preview": task.initial_code[:120],
-    })
-
-    # 3. 编辑文件 — 修复 bug
+    # 写入修复后的代码
     csv_file.write_text(task.expected_code, encoding="utf-8")
-    recorder.record("edit_file", {
-        "file": "tasks/csv_reader.py",
-        "change": "添加空行跳过：if not stripped: continue",
-    })
+    recorder.record("edit_file", {"file": "tasks/csv_reader.py", "change": "添加空行跳过逻辑"})
 
-    # 4. 运行验证
+    # 运行验证
     verify_result = recorder.record_run(
         "cd tasks && python -c \"from csv_reader import read_csv_lines; "
-        "data = read_csv_lines('test.csv'); print(f'读取 {len(data)} 行, 内容: {data}')\""
+        "data = read_csv_lines('test.csv'); print(f'OK: {len(data)} 行')\""
     )
-
     if verify_result.get("exit_code") == 0:
-        recorder.record("verify", {"result": "通过", "output": verify_result.get("stdout", "")})
+        recorder.record("verify", {"result": "通过"})
     else:
-        recorder.record("fix_error", {"error": verify_result.get("stderr", ""), "attempt": 1})
+        recorder.record("fix_error", {"error": verify_result.get("stderr", "")})
 
-    # ─── 结束记录，输出 JSONL ─────────────────────────
+    # ─── 第5步：结束 + 输出 JSONL ──────────────────────
     record = recorder.finalize(task_type=task.task_type)
-
     jsonl_path = ROOT / "output" / "agent_records.jsonl"
     record_to_jsonl(record, str(jsonl_path))
 

@@ -1,14 +1,14 @@
 {
   "status": "failed",
-  "record_id": "REC-D3D6BB7BFE90",
+  "record_id": "REC-B5E1D3B5D20C",
   "validation": {
     "valid": false,
-    "reason": "Patch 应用失败: error: corrupt patch at line 94\n"
+    "reason": "缺少 initial_commit 或 unified_diff"
   },
   "summary": {
     "task_type": "bug_fix",
     "steps": 5,
-    "has_diff": true,
+    "has_diff": false,
     "has_env_info": true,
     "total_duration_sec": 0.56
   }
